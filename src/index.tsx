@@ -5,11 +5,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { EpisodeDetails } from './pages/EpisodeDetails';
 
-import './styles/global-styles.css';
+import { GlobalStyle } from './styles/GlobalStyle';
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
+      <GlobalStyle />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/episode/:season/:number" element={<EpisodeDetails />} />
