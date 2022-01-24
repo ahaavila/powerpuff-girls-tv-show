@@ -5,9 +5,6 @@ export const GET_EPISODES = 'GET_EPISODES';
 export const GET_EPISODES_BY_ID = 'GET_EPISODES_BY_ID';
 
 export const getEpisodes = async() => {
-  console.log('entrei aqui');
-  
-
   const params = qs.stringify({
     q: 'Powerpuff Girls 2016',
     embed: 'episodes',
@@ -15,10 +12,7 @@ export const getEpisodes = async() => {
   const payload = await axios.get(
     `https://api.tvmaze.com/singlesearch/shows?${params}`,
   );
-
-  console.log(payload);
   
-
   return {
     type: GET_EPISODES,
     episodes: {
