@@ -30,6 +30,6 @@ export const EpisodeInfo = ({
     </p>
     <p>Airdate: {moment(`${airdate}T${airtime}`).format('LLLL')}</p>
     <p>Runtime: {runtime} minutes</p>
-    <p>Rating: {rating.average || 'waiting for more votes'}</p>
+    <p>Rating: {rating?.average || 'waiting for more votes'}</p>
   </EpisodeInfoDiv>
 );
