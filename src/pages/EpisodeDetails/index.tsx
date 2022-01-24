@@ -1,52 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import { connect } from 'react-redux';
+import { getEpisodeById } from '../../actions/index';
 
 import { Header } from '../../components/Header';
 import { EpisodeInfo } from '../../components/EpisodeInfo';
 import { Spinner } from '../../components/Spinner';
 
-import { ImageProps } from '../../components/EpisodeCard';
-import { RatingProps } from '../../components/EpisodeInfo';
-
 import { EpisodeContainer, EpisodeSection } from './styles';
 
-export interface Episode {
-  name: string;
-  image: ImageProps;
-  summary: string;
-  season: number;
-  number: number;
-  airdate: string;
-  airtime: string;
-  runtime: number;
-  rating: RatingProps;
-}
-
-export const EpisodeDetails = () => {
+const EpisodeDetails = ({ episode, getEpisodeById }) => {
   const { season, number } = useParams();
 
-  const [episode, setEpisode] = useState<Episode>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    getEpisode();
-  }, []);
-
-  const getEpisode = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `https://api.tvmaze.com/shows/6771/episodebynumber?season=${season}&number=${number}`,
-      );
-      console.log(response);
-      setEpisode(response.data);
-    } catch (err) {
-      console.error(err.mesage);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLoading(true);
+    getEpisodeById(season, number);
+    setLoading(false);
+  }, [getEpisodeById]);
 
   return (
     <EpisodeContainer>
@@ -74,3 +46,11 @@ export const EpisodeDetails = () => {
     </EpisodeContainer>
   );
 };
+
+const mapStateToProps = store => {
+  return {
+    episode: store.episodeState.episode
+  }
+}
+
+export default connect(mapStateToProps, { getEpisodeById })(EpisodeDetails);

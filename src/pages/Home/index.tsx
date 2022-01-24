@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import qs from 'qs';
+import { connect } from 'react-redux';
+
+import { getEpisodes } from '../../actions/index';
 
 import { Episodes } from '../../components/Episodes';
 import { Header } from '../../components/Header';
@@ -29,8 +30,8 @@ export interface Show {
   summary: string;
 }
 
-export const Home = () => {
-  const [episodes, setEpisodes] = useState<[]>();
+const Home = ({ episodes, getEpisodes }) => {
+  const [episodesShow, setEpisodesShow] = useState<[]>();
   const [allEpisodes, setAllEpisodes] = useState<[]>();
   const [show, setShow] = useState<Show>();
   const [page, setPage] = useState<number>(0);
@@ -39,22 +40,13 @@ export const Home = () => {
 
   useEffect(() => {
     getEpisodes();
-  }, []);
+  }, [getEpisodes]);
 
-  const getEpisodes = async () => {
-    const params = qs.stringify({
-      q: 'Powerpuff Girls 2016',
-      embed: 'episodes',
-    });
-    const response = await axios.get(
-      `https://api.tvmaze.com/singlesearch/shows?${params}`,
-    );
-    console.log(response);
-
-    setShow(response.data);
-    setAllEpisodes(response.data._embedded.episodes);
-    setEpisodes(response.data._embedded.episodes.slice(page, episodesPerPage));
-  };
+  useEffect(() => {
+    setShow(episodes?.show);
+    setAllEpisodes(episodes?.allEpisodes);
+    setEpisodesShow(episodes?.allEpisodes.slice(page, episodesPerPage));
+  }, [episodes]);
 
   const loadMoreEpisodes = () => {
     const nextPage = page + episodesPerPage;
@@ -62,9 +54,9 @@ export const Home = () => {
       nextPage,
       nextPage + episodesPerPage,
     );
-    episodes.push(...nextEpisodes);
+    episodesShow.push(...nextEpisodes);
 
-    setEpisodes(episodes);
+    setEpisodesShow(episodesShow);
     setPage(nextPage);
   };
 
@@ -74,10 +66,10 @@ export const Home = () => {
 
   const noMoreEpisodes = page + episodesPerPage >= allEpisodes?.length;
   const filteredEpisodes = !!searchValue
-    ? allEpisodes.filter((episodes: Episodes) =>
-        episodes.name.toLowerCase().includes(searchValue.toLocaleLowerCase()),
+    ? allEpisodes.filter((epi: Episodes) =>
+        epi.name.toLowerCase().includes(searchValue.toLocaleLowerCase()),
       )
-    : episodes;
+    : episodesShow;
 
   return (
     <Container>
@@ -105,3 +97,11 @@ export const Home = () => {
     </Container>
   );
 };
+
+const mapStateToProps = store => {
+  return {
+    episodes: store.episodesState.episodes
+  }
+}
+
+export default connect(mapStateToProps, { getEpisodes })(Home);
